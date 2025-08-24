@@ -25,6 +25,9 @@ export default (err, req, res, next) => {
     err.message = "File upload error.";
   }
 
+  if(err.code === 11000){
+    err.message = "Duplicate field value entered.";
+  }
 
   return res.status(err.statusCode).json({
     success: false,
