@@ -1,4 +1,5 @@
 import Product from "../models/productModel.js";
+import ErrorHandler from "../utils/handleError.js";
 
 // Create Product
 export const createProduct = async (req, res) => {
@@ -16,16 +17,10 @@ export const createProduct = async (req, res) => {
     // Handle mongoose validation errors
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((val) => val.message);
-      return res.status(400).json({
-        success: false,
-        message: messages.join(", "),
-      });
+      return next(new ErrorHandler(messages.join(", "), 400));
     }
 
-    return res.status(500).json({
-      success: false,
-      message: "Server error. Please try again later.",
-    });
+    return next(new ErrorHandler("Server error. Please try again later.", 500));
   }
 };
 
@@ -35,10 +30,7 @@ export const getProducts = async (req, res) => {
     const products = await Product.find();
 
     if (!products || products.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No products found.",
-      });
+      return next(new ErrorHandler("No products found.", 404));
     }
 
     return res.status(200).json({
@@ -48,10 +40,7 @@ export const getProducts = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching products:", error.message);
-    return res.status(500).json({
-      success: false,
-      message: "Server error. Please try again later.",
-    });
+    return next(new ErrorHandler("Server error. Please try again later.", 500));
   }
 };
 
@@ -65,10 +54,7 @@ export const updateProduct = async (req, res) => {
     });
 
     if (!updatedProduct) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found.",
-      });
+      return next(new ErrorHandler("Product not found.", 404));
     }
 
     return res.status(200).json({
@@ -82,15 +68,47 @@ export const updateProduct = async (req, res) => {
     // Handle mongoose validation errors
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((val) => val.message);
-      return res.status(400).json({
-        success: false,
-        message: messages.join(", "),
-      });
+      return next(new ErrorHandler(messages.join(", "), 400));
     }
 
-    return res.status(500).json({
-      success: false,
-      message: "Server error. Please try again later.",
+    return next(new ErrorHandler("Server error. Please try again later.", 500));
+  }
+};
+
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedProduct = await Product.findByIdAndDelete(id);
+
+    if (!deletedProduct) {
+      return next(new ErrorHandler("Product not found.", 404));
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Product deleted successfully.",
     });
+  } catch (error) {
+    console.error("Error deleting product:", error.message);
+    return next(new ErrorHandler("Server error. Please try again later.", 500));
+  }
+};
+
+export const getProductDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return next(new ErrorHandler("Product not found.", 404));
+    }
+
+    return res.status(200).json({
+      success: true,
+      product,
+    });
+  } catch (error) {
+    console.error("Error fetching product details:", error.message);
+    return next(new ErrorHandler("Server error. Please try again later.", 500));
   }
 };
