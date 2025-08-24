@@ -125,3 +125,127 @@ export const getProductDetails = async (req, res, next) => {
     return next(new ErrorHandler("Server error. Please try again later.", 500));
   }
 };
+
+export const getAdminProducts = async (req, res, next) => {
+  try {
+    const products = await Product.find();
+    return res.status(200).json({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    console.error("Error fetching admin products:", error.message);
+    return next(new ErrorHandler("Server error. Please try again later.", 500));
+  }
+};
+
+
+export const createProductReview = async (req, res, next) => {
+    try {
+        const { rating, comment } = req.body;
+        const productId = req.params.id;
+
+        // Validate user input
+        if (!rating || !comment) {
+            return next(new ErrorHandler("Please provide all fields.", 400));
+        }
+
+        // Find product by ID
+        const product = await Product.findById(productId);
+        if (!product) {
+            return next(new ErrorHandler("Product not found.", 404));
+        }
+
+        // Check if user has already reviewed the product
+        const existingReview = product.reviews.find(
+            (review) => review.user.toString() === req.user.id
+        );
+        if (existingReview) {
+            return next(new ErrorHandler("You have already reviewed this product.", 400));
+        }
+
+        // Add new review
+        const newReview = {
+            user: req.user.id,
+            name: req.user.name,
+            rating,
+            comment
+        };
+        product.reviews.push(newReview);
+        product.numOfReviews = product.reviews.length;
+
+        // Calculate average rating
+        product.rating = product.reviews.reduce((acc, review) => acc + review.rating, 0) / product.numOfReviews;
+
+        await product.save();
+
+        return res.status(201).json({
+            success: true,
+            message: "Review added successfully."
+        });
+    } catch (error) {
+        console.error("Error creating product review:", error.message);
+        return next(new ErrorHandler("Server error. Please try again later.", 500));
+    }
+}
+
+export const getProductReviews = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findById(id);
+
+        if (!product) {
+            return next(new ErrorHandler("Product not found.", 404));
+        }
+
+        return res.status(200).json({
+            success: true,
+            reviews: product.reviews
+        });
+    } catch (error) {
+        console.error("Error fetching product reviews:", error.message);
+        return next(new ErrorHandler("Server error. Please try again later.", 500));
+    }
+};
+
+
+export const deleteProductReview = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { reviewId } = req.body;
+
+        // Find product by ID
+        const product = await Product.findById(id);
+        if (!product) {
+            return next(new ErrorHandler("Product not found.", 404));
+        }
+
+        // Find review by ID
+        const review = product.reviews.find((r) => r._id.toString() === reviewId);
+        if (!review) {
+            return next(new ErrorHandler("Review not found.", 404));
+        }
+
+        // Check if user is authorized to delete the review
+        if (review.user.toString() !== req.user.id) {
+            return next(new ErrorHandler("You are not authorized to delete this review.", 403));
+        }
+
+        // Remove review from product
+        product.reviews = product.reviews.filter((r) => r._id.toString() !== reviewId);
+        product.numOfReviews = product.reviews.length;
+
+        // Calculate new average rating
+        product.rating = product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.numOfReviews;
+
+        await product.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Review deleted successfully."
+        });
+    } catch (error) {
+        console.error("Error deleting product review:", error.message);
+        return next(new ErrorHandler("Server error. Please try again later.", 500));
+    }
+};

@@ -19,3 +19,12 @@ export const verifyUserAuth=async(req,res,next)=>{
         return next(new ErrorHandler("Not authorized to access this route", 401));
     }
 }
+
+export const roleBasedAccess=(roles)=>{
+    return (req,res,next)=>{
+        if(!req.user || !roles.includes(req.user.role)){
+            return next(new ErrorHandler("Not authorized to access this route", 403));
+        }
+        next();
+    }
+}
