@@ -69,6 +69,13 @@ const productSchema=new mongoose.Schema({
             }
         }
     ],
+    colors: [{ type: String }],
+  sizes: [
+    {
+      size: { type: String, required: true },
+      stock: { type: Number, required: true, default: 0 }
+    }
+  ],
     createdAt:{
         type:Date,
         default:Date.now

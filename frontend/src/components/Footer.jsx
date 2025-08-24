@@ -19,10 +19,12 @@ import {
 import { styled } from '@mui/material/styles';
 
 const StyledFooter = styled(Box)(() => ({
-  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+  background: 'linear-gradient(135deg, #1e1e1e 0%, #292929 50%, #3b3b3b 100%)',
   color: 'white',
   marginTop: 'auto',
 }));
+
+
 
 const SocialIconButton = styled(IconButton)(() => ({
   color: 'white',
