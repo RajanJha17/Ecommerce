@@ -13,11 +13,11 @@ const getRandomGradient = () => {
     return gradients[Math.floor(Math.random() * gradients.length)];
 };
 import { Box, Button, Card, CardContent, Chip, Container, Divider, Grid, IconButton, keyframes, Link, Paper, Rating, Stack, styled, Typography, useMediaQuery, useTheme } from '@mui/material';
+import Product from '../components/Product';
 import React, { useState, useRef } from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import Product from '../components/Product';
 import Loader from '../components/Loader';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
@@ -689,67 +689,7 @@ const Home = () => {
                 </Container>
             </Box>
 
-            {/* Categories Section */}
-            {/* <Box sx={{ py: 8, bgcolor: 'background.paper' }}>
-                <Container maxWidth="lg">
-                    <SectionHeader 
-                        title="Shop by Category" 
-                        subtitle="Browse our product categories" 
-                        linkText="View All Categories"
-                        linkTo="/categories"
-                    />
-                    <Grid container spacing={4} sx={{ justifyContent: 'center', mb: 10, px: { xs: 2, sm: 3, md: 4 } }}>
-                        {categories.map((category) => (
-                            <Grid item xs={6} sm={4} md={3} lg={2.4} key={category.id} sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <CategoryCard 
-                                    component={RouterLink}
-                                    to={`/category/${category.id}`}
-                                    sx={{
-                                        width: '100%',
-                                        maxWidth: 300,
-                                        minHeight: 260,
-                                        p: 4,
-                                        textAlign: 'center',
-                                        textDecoration: 'none',
-                                        borderRadius: 2,
-                                        transition: 'all 0.3s ease',
-                                        '&:hover': {
-                                            boxShadow: '0 12px 28px rgba(0,0,0,0.12)',
-                                            transform: 'translateY(-6px)'
-                                        }
-                                    }}
-                                >
-                                    <IconContainer>
-                                        {category.icon}
-                                    </IconContainer>
-                                    <Typography variant="h6" sx={{ 
-                                        fontWeight: 700, 
-                                        mb: 1,
-                                        color: 'text.primary',
-                                        fontSize: '1.1rem'
-                                    }}>
-                                        {category.name}
-                                    </Typography>
-                                    <Chip 
-                                        label={`${category.count} items`} 
-                                        size="small" 
-                                        sx={{ 
-                                            bgcolor: 'action.hover',
-                                            color: 'text.secondary',
-                                            fontWeight: 500,
-                                            fontSize: '0.75rem',
-                                            height: 24,
-                                            '& .MuiChip-label': {
-                                                px: 1.5
-                                            }
-                                        }}
-                                    />
-                                </CategoryCard>
-                            </Grid>
-                        ))}
-                    </Grid>
-                </Container>
-            </Box> */}
+           
 
             {/* Featured Products */}
             <Box sx={{ py: 8, bgcolor: 'background.default' }}>

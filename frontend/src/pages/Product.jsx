@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProduct } from '../features/products/productSlice';
 import Loader from '../components/Loader';
+import { useNavigate } from 'react-router-dom';
 
 const categories = ['Shirt', 'Pants', 'Shoes'];
 const colors = ['Black', 'White', 'Navy', 'Gray'];
@@ -9,6 +10,7 @@ const sizes = ['S', 'M', 'L', 'XL'];
 
 const Product = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { products, loading, error, productCount } = useSelector((state) => state.product);
   
   // Filter state
@@ -269,6 +271,7 @@ const Product = () => {
               {product.category} | {product.color} | {product.size}
             </div>
             <button
+            onClick={() => navigate(`/product/${product._id}`)}
               style={{
                 marginTop: 8,
                 padding: '6px 18px',
