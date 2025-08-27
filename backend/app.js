@@ -11,7 +11,7 @@ const app=express();
 
 app.use(cors(
     {
-        origin: 'https://ecommerce-jiot.onrender.com',
+        origin: 'https://sika-jade.vercel.app',
         credentials: true,
     }
 ));
