@@ -288,48 +288,84 @@ const Product = () => {
 
       {/* Pagination */}
       {/* Pagination */}
-{totalPages > 1 && (
+{/* Pagination */}
+{totalPages >= 1 && (
   <div
     style={{
       display: 'flex',
       justifyContent: 'center',
-      marginTop: 32,
-      gap: 6,
+      marginTop: '2rem',
+      gap: '0.5rem',
       flexWrap: 'wrap',
+      padding: '1rem 0',
     }}
   >
+    {/* Previous */}
     <button
       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
       disabled={currentPage === 1}
-      className="px-4 py-2 border rounded-md disabled:opacity-50"
+      style={{
+        padding: '0.5rem 1rem',
+        border: '1px solid #e2e8f0',
+        borderRadius: '0.25rem',
+        background: currentPage === 1 ? '#f1f5f9' : 'white',
+        cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+        color: currentPage === 1 ? '#94a3b8' : '#334155',
+        fontWeight: 500,
+      }}
     >
-      Previous
+      ‹ Previous
     </button>
 
-    {/* Page numbers */}
-    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-      <button
-        key={page}
-        onClick={() => setCurrentPage(page)}
-        className={`px-3 py-2 border rounded-md ${
-          currentPage === page
-            ? "bg-blue-600 text-white font-semibold"
-            : "bg-white hover:bg-gray-100"
-        }`}
-      >
-        {page}
-      </button>
-    ))}
-
+    {/* Next */}
     <button
       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-      disabled={currentPage === totalPages || products.length < productsPerPage}
-      className="px-4 py-2 border rounded-md disabled:opacity-50"
+      disabled={currentPage === totalPages}
+      style={{
+        padding: '0.5rem 1rem',
+        border: '1px solid #e2e8f0',
+        borderRadius: '0.25rem',
+        background: currentPage === totalPages ? '#f1f5f9' : 'white',
+        cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+        color: currentPage === totalPages ? '#94a3b8' : '#334155',
+        fontWeight: 500,
+      }}
     >
-      Next
+      Next ›
     </button>
+
+    {/* Last Page */}
+    <button
+      onClick={() => setCurrentPage(totalPages)}
+      disabled={currentPage === totalPages}
+      style={{
+        padding: '0.5rem 1rem',
+        border: '1px solid #e2e8f0',
+        borderRadius: '0.25rem',
+        background: currentPage === totalPages ? '#f1f5f9' : 'white',
+        cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+        color: currentPage === totalPages ? '#94a3b8' : '#334155',
+        fontWeight: 500,
+      }}
+    >
+      Last »
+    </button>
+
+    {/* Page Info */}
+    <div
+      style={{
+        marginLeft: '1rem',
+        fontSize: '0.875rem',
+        color: '#64748b',
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+      {productCount || 0} items • Page {currentPage} of {totalPages}
+    </div>
   </div>
 )}
+
 
     </>
   )}

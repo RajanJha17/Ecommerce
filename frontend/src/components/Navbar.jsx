@@ -1,11 +1,31 @@
 import { PersonAdd, ShoppingCart, Search, Close } from '@mui/icons-material'
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Navbar.css';
-
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const isAuthenticated=false;
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef(null);
+  const navigate = useNavigate();
+  const isAuthenticated = false;
+
+  // Focus search input when search opens
+  useEffect(() => {
+    if (searchOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [searchOpen]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+      setSearchOpen(false);
+    }
+  };
   return (
     <nav className="navbar-container">
       {/* Left: Logo and Brand */}
@@ -34,9 +54,65 @@ const Navbar = () => {
       </ul>
       {/* Right: Search, Cart, Register, Hamburger */}
       <div className="navbar-actions">
-        <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#333', fontSize: '1.7rem', display: 'flex', alignItems: 'center' }} aria-label="Search">
-          <Search />
-        </button>
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          {searchOpen ? (
+            <div style={{ 
+              position: 'absolute', 
+              right: '100%',
+              backgroundColor: 'white',
+              padding: '0.5rem',
+              borderRadius: '4px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              zIndex: 1000,
+              width: '250px'
+            }}>
+              <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.5rem' }}>
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  style={{
+                    padding: '0.5rem',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    width: '100%',
+                    outline: 'none'
+                  }}
+                />
+                <button 
+                  type="submit"
+                  style={{
+                    background: '#f59e42',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '0 1rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Go
+                </button>
+              </form>
+            </div>
+          ) : null}
+          <button 
+            onClick={() => setSearchOpen(!searchOpen)}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              cursor: 'pointer', 
+              color: '#333', 
+              fontSize: '1.7rem', 
+              display: 'flex', 
+              alignItems: 'center' 
+            }} 
+            aria-label="Search"
+          >
+            <Search />
+          </button>
+        </div>
         <a href="/cart" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#333', fontSize: '1.5rem', padding: '0 0.5rem' }} title="Cart">
           <ShoppingCart />
         </a>

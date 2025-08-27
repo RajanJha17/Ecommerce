@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProductDetails from './pages/ProductDetails';
 import Product from './pages/Product';
+import SearchResults from './pages/SearchResults';
 
 
 
@@ -37,8 +38,9 @@ const App = () => {
    <Layout>
      <Routes>
       <Route path="/" element={<Home />} />
-      <Route path='/product/:id' element={<ProductDetails />} />
-      <Route path='/product' element={<Product />} />
+      <Route path="/search" element={<SearchResults />} />
+      <Route path="/product/:id" element={<ProductDetails />} />
+      <Route path="/product" element={<Product />} />
 
     </Routes>
    </Layout>
