@@ -6,7 +6,7 @@ const productRouter=express.Router();
 
 productRouter.route("/products").get(getProducts);
 productRouter.route("/admin/products").get(verifyUserAuth,roleBasedAccess('admin'),getAdminProducts);
-productRouter.route("/admin/products").post(verifyUserAuth,createProduct);
+productRouter.route("/admin/products").post(createProduct);
 productRouter.route("/admin/products/:id").put(verifyUserAuth,roleBasedAccess('admin'),updateProduct);
 productRouter.route("/admin/products/:id").delete(verifyUserAuth,roleBasedAccess('admin'),deleteProduct);
 productRouter.route("/products/:id").get(getProductDetails);

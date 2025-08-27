@@ -1,30 +1,117 @@
-import { ArrowForward, LocalOffer, PlayArrow, Star, TrendingUp, ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
-import { Box, Button, Chip, Container, Grid, keyframes, Link, Paper, styled, Typography, useMediaQuery, useTheme } from '@mui/material';
-import React, { useState } from 'react'
+import { ArrowForward, LocalOffer, Star, TrendingUp, ArrowBackIos, ArrowForwardIos, FlashOn, Whatshot, Category, Timer, LocalShipping, Security, SupportAgent, Replay, CheckCircle, PlayArrow } from '@mui/icons-material';
+
+// Helper function to generate random gradients
+const getRandomGradient = () => {
+    const gradients = [
+        '#667eea, #764ba2',
+        '#ff9a9e, #fad0c4',
+        '#a1c4fd, #c2e9fb',
+        '#ffc3a0, #ffafbd',
+        '#84fab0, #8fd3f4',
+        '#a6c1ee, #fbc2eb'
+    ];
+    return gradients[Math.floor(Math.random() * gradients.length)];
+};
+import { Box, Button, Card, CardContent, Chip, Container, Divider, Grid, IconButton, keyframes, Link, Paper, Rating, Stack, styled, Typography, useMediaQuery, useTheme } from '@mui/material';
+import React, { useState, useRef } from 'react';
 import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import Product from '../components/Product';
 import Loader from '../components/Loader';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { getProduct, removeError } from '../features/products/productSlice';
 import { toast } from 'react-toastify';
+import { Link as RouterLink } from 'react-router-dom';
 
 
+
+// Clothing categories
+const categories = [
+    { id: 1, name: 'New Arrivals', icon: '🆕', count: 45 },
+    { id: 2, name: 'Men', icon: '👔', count: 128 },
+    { id: 3, name: 'Women', icon: '👗', count: 156 },
+    { id: 4, name: 'Accessories', icon: '🕶️', count: 89 },
+    { id: 5, name: 'Sale', icon: '🏷️', count: 67 },
+];
+
+// Featured clothing products
+const featuredProducts = [
+    { 
+        id: 1, 
+        name: 'Classic White Shirt', 
+        price: 49.99, 
+        originalPrice: 69.99,
+        rating: 4.7, 
+        image: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=500&h=600&fit=crop&crop=faces',
+        colors: ['white', 'blue', 'black']
+    },
+    { 
+        id: 2, 
+        name: 'Slim Fit Jeans', 
+        price: 79.99, 
+        originalPrice: 99.99,
+        rating: 4.5, 
+        image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=600&fit=crop&crop=faces',
+        colors: ['blue', 'black']
+    },
+    { 
+        id: 3, 
+        name: 'Summer Dress', 
+        price: 59.99, 
+        originalPrice: 79.99,
+        rating: 4.8, 
+        image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=500&h=600&fit=crop&crop=faces',
+        colors: ['yellow', 'pink', 'white']
+    },
+    { 
+        id: 4, 
+        name: 'Leather Jacket', 
+        price: 199.99, 
+        rating: 4.9, 
+        image: 'https://images.unsplash.com/photo-1551028719-00167d1e1b1b?w=500&h=600&fit=crop&crop=faces',
+        colors: ['black', 'brown']
+    },
+];
 
 const Home = () => {
-    const { products, loading, error,productCount } = useSelector((state) => state.product);
-    console.log("Products:", products);
-    const dispatch=useDispatch();
+    const { products, loading, error } = useSelector((state) => state.product);
+    const sliderRef = useRef(null);
+    const dispatch = useDispatch();
+    
     useEffect(() => {
         dispatch(getProduct());
     }, [dispatch]);
 
-    useEffect(()=>{
-        if(error){
-            toast.error(error.message,{position:'top-center',autoClose:3000})
+    useEffect(() => {
+        if (error) {
+            toast.error(error.message, { position: 'top-center', autoClose: 3000 });
             dispatch(removeError());
         }
-    },[error,dispatch])
+    }, [error, dispatch]);
+
+    const settings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 4,
+        slidesToScroll: 1,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: { slidesToShow: 3, slidesToScroll: 1 }
+            },
+            {
+                breakpoint: 768,
+                settings: { slidesToShow: 2, slidesToScroll: 1 }
+            },
+            {
+                breakpoint: 480,
+                settings: { slidesToShow: 1, slidesToScroll: 1 }
+            },
+        ],
+    };
 
     const fadeInUp = keyframes`
   from {
@@ -204,23 +291,109 @@ const Home = () => {
         },
     }));
 
-    
+    const CategoryName = styled(Typography)(({ theme }) => ({
+        fontWeight: 700,
+        fontSize: '1.1rem',
+        marginBottom: theme.spacing(1.5),
+        color: theme.palette.text.primary,
+        letterSpacing: 0.5,
+    }));
 
-    // Banner image and content (static)
+    const CategoryCard = styled(Card)(({ theme }) => ({
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: theme.spacing(3),
+        textAlign: 'center',
+        textDecoration: 'none',
+        transition: 'all 0.3s ease-in-out',
+        borderRadius: theme.shape.borderRadius * 2,
+        border: `1px solid ${theme.palette.divider}`,
+        '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: theme.shadows[8],
+            borderColor: 'transparent',
+        },
+    }));
+
+    const IconContainer = styled(Box)(({ theme }) => ({
+        width: 90,
+        height: 90,
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: theme.spacing(3),
+        fontSize: '2.8rem',
+        color: theme.palette.primary.contrastText,
+        background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+        transition: 'all 0.3s ease-in-out',
+        '&:hover': {
+            transform: 'scale(1.1) rotate(5deg)',
+        },
+    }));
+
     const banner = {
-        image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&h=1080&fit=crop',
-        title: 'New Collection 2024',
-        subtitle: 'Discover the latest trends in fashion',
-        description: 'Step into the future of style with our carefully curated collection',
+        image: 'https://images.unsplash.com/photo-1485462537746-965f33f7f6a7?w=1920&h=1080&fit=crop',
+        title: 'Summer Collection 2024',
+        subtitle: 'Discover the latest in fashion',
+        description: 'Step into summer with our exclusive collection of premium clothing and accessories',
         cta: 'Shop Now',
         badge: 'NEW',
-        color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%)',
         icon: <TrendingUp />
     };
     if (loading) return <Loader />;
 
+    const SectionHeader = ({ title, subtitle, linkText, linkTo = '#' }) => (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+            <Box>
+                <Typography variant="h4" component="h2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                    {title}
+                </Typography>
+                {subtitle && (
+                    <Typography variant="subtitle1" color="text.secondary">
+                        {subtitle}
+                    </Typography>
+                )}
+            </Box>
+            <Button
+                component={RouterLink}
+                to={linkTo}
+                endIcon={<ArrowForward />}
+                sx={{ textTransform: 'none', color: 'primary.main' }}
+            >
+                {linkText}
+            </Button>
+        </Box>
+    );
+
+    const FeatureCard = ({ icon, title, description }) => (
+        <Box sx={{ textAlign: 'center', p: 3 }}>
+            <Box sx={{ 
+                width: 80, 
+                height: 80, 
+                borderRadius: '50%', 
+                bgcolor: 'primary.light', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 2
+            }}>
+                {icon}
+            </Box>
+            <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>{title}</Typography>
+            <Typography variant="body2" color="text.secondary">{description}</Typography>
+        </Box>
+    );
+
     return (
-        <div style={{ overflowX: 'hidden' }}>
+        <Box sx={{ overflowX: 'hidden' }}>
+            {/* Hero Section */}
             <Box sx={{ mb: 8, position: 'relative', overflowX: 'hidden' }}>
                 <HeroBanner>
                     {/* Background Image */}
@@ -346,7 +519,9 @@ const Home = () => {
                                             size="large"
                                             endIcon={<ArrowForward />}
                                         >
+                                            <Link to="/product">
                                             {banner.cta}
+                                            </Link>
                                         </AnimatedButton>
                                         <Button
                                             variant="outlined"
@@ -472,7 +647,223 @@ const Home = () => {
                     <Product key={item._id} product={item} />
                 ))}
             </Box>
-        </div>
+
+            {/* Features Section */}
+            <Box sx={{ py: 10, bgcolor: 'background.paper' }}>
+                <Container maxWidth="lg">
+                    <SectionHeader 
+                        title="Why Choose Us" 
+                        subtitle="We provide the best shopping experience" 
+                        linkText=""
+                        linkTo=""
+                    />
+                    <Grid container spacing={4} justifyContent="center">
+                        <Grid item xs={12} sm={6} md={4} sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <Box sx={{ maxWidth: 360, width: '100%' }}>
+                                <FeatureCard 
+                                    icon={<LocalShipping sx={{ fontSize: 48, color: 'primary.main' }} />}
+                                    title="Free Shipping"
+                                    description="Free delivery on all orders over $50"
+                                />
+                            </Box>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={4} sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <Box sx={{ maxWidth: 360, width: '100%' }}>
+                                <FeatureCard 
+                                    icon={<Security sx={{ fontSize: 48, color: 'primary.main' }} />}
+                                    title="Secure Payment"
+                                    description="100% secure payment processing"
+                                />
+                            </Box>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={4} sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <Box sx={{ maxWidth: 360, width: '100%' }}>
+                                <FeatureCard 
+                                    icon={<SupportAgent sx={{ fontSize: 48, color: 'primary.main' }} />}
+                                    title="24/7 Support"
+                                    description="Dedicated customer support team"
+                                />
+                            </Box>
+                        </Grid>
+                    </Grid>
+                </Container>
+            </Box>
+
+            {/* Categories Section */}
+            {/* <Box sx={{ py: 8, bgcolor: 'background.paper' }}>
+                <Container maxWidth="lg">
+                    <SectionHeader 
+                        title="Shop by Category" 
+                        subtitle="Browse our product categories" 
+                        linkText="View All Categories"
+                        linkTo="/categories"
+                    />
+                    <Grid container spacing={4} sx={{ justifyContent: 'center', mb: 10, px: { xs: 2, sm: 3, md: 4 } }}>
+                        {categories.map((category) => (
+                            <Grid item xs={6} sm={4} md={3} lg={2.4} key={category.id} sx={{ display: 'flex', justifyContent: 'center' }}>
+                                <CategoryCard 
+                                    component={RouterLink}
+                                    to={`/category/${category.id}`}
+                                    sx={{
+                                        width: '100%',
+                                        maxWidth: 300,
+                                        minHeight: 260,
+                                        p: 4,
+                                        textAlign: 'center',
+                                        textDecoration: 'none',
+                                        borderRadius: 2,
+                                        transition: 'all 0.3s ease',
+                                        '&:hover': {
+                                            boxShadow: '0 12px 28px rgba(0,0,0,0.12)',
+                                            transform: 'translateY(-6px)'
+                                        }
+                                    }}
+                                >
+                                    <IconContainer>
+                                        {category.icon}
+                                    </IconContainer>
+                                    <Typography variant="h6" sx={{ 
+                                        fontWeight: 700, 
+                                        mb: 1,
+                                        color: 'text.primary',
+                                        fontSize: '1.1rem'
+                                    }}>
+                                        {category.name}
+                                    </Typography>
+                                    <Chip 
+                                        label={`${category.count} items`} 
+                                        size="small" 
+                                        sx={{ 
+                                            bgcolor: 'action.hover',
+                                            color: 'text.secondary',
+                                            fontWeight: 500,
+                                            fontSize: '0.75rem',
+                                            height: 24,
+                                            '& .MuiChip-label': {
+                                                px: 1.5
+                                            }
+                                        }}
+                                    />
+                                </CategoryCard>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Container>
+            </Box> */}
+
+            {/* Featured Products */}
+            <Box sx={{ py: 8, bgcolor: 'background.default' }}>
+                <Container maxWidth="lg">
+                    <SectionHeader 
+                        title="Featured Products" 
+                        subtitle="Handpicked for you" 
+                        linkText="View All"
+                        linkTo="/products"
+                    />
+                    <Slider ref={sliderRef} {...settings}>
+                        {featuredProducts.map((product) => (
+                            <Box key={product.id} sx={{ px: 1 }}>
+                                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 2, borderRadius: 2 }}>
+                                    <Box sx={{ 
+                                        height: 200, 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center',
+                                        mb: 2
+                                    }}>
+                                        <img 
+                                            src={product.image} 
+                                            alt={product.name} 
+                                            style={{ 
+                                                width: '100%',
+                                                height: '100%',
+                                                objectFit: 'cover',
+                                                transition: 'transform 0.3s ease',
+                                                '&:hover': {
+                                                    transform: 'scale(1.05)'
+                                                }
+                                            }} 
+                                        />
+                                    </Box>
+                                    <Box sx={{ mt: 'auto' }}>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
+                                            {product.name}
+                                        </Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                            <Rating value={product.rating} precision={0.5} readOnly size="small" />
+                                            <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                                                ({product.rating})
+                                            </Typography>
+                                        </Box>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Typography variant="h6" color="error" sx={{ fontWeight: 700 }}>
+                                                ${product.price.toFixed(2)}
+                                            </Typography>
+                                            {product.originalPrice && (
+                                                <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through' }}>
+                                                    ${product.originalPrice.toFixed(2)}
+                                                </Typography>
+                                            )}
+                                        </Box>
+                                        <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                                            {product.colors && product.colors.map((color, index) => (
+                                                <Box 
+                                                    key={index}
+                                                    sx={{
+                                                        width: 20,
+                                                        height: 20,
+                                                        borderRadius: '50%',
+                                                        backgroundColor: color,
+                                                        border: '1px solid #e0e0e0',
+                                                        cursor: 'pointer',
+                                                        '&:hover': {
+                                                            transform: 'scale(1.1)'
+                                                        }
+                                                    }}
+                                                />
+                                            ))}
+                                        </Box>
+                                    </Box>
+                                </Card>
+                            </Box>
+                        ))}
+                    </Slider>
+                </Container>
+            </Box>
+
+            {/* Call to Action */}
+            <Box sx={{ py: 12, bgcolor: 'primary.main', color: 'white', textAlign: 'center' }}>
+                <Container maxWidth="md">
+                    <Typography variant="h3" component="h2" sx={{ mb: 3, fontWeight: 700 }}>
+                        Ready to Experience the Best?
+                    </Typography>
+                    <Typography variant="h6" sx={{ mb: 4, opacity: 0.9, maxWidth: 700, mx: 'auto' }}>
+                        Join thousands of satisfied customers who trust us for quality products and exceptional service.
+                    </Typography>
+                    <Button 
+                        variant="contained" 
+                        color="secondary" 
+                        size="large"
+                        component={RouterLink}
+                        to="/products"
+                        sx={{
+                            px: 6,
+                            py: 1.5,
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            fontSize: '1.1rem',
+                            fontWeight: 600,
+                            '&:hover': {
+                                transform: 'translateY(-2px)',
+                                boxShadow: 3,
+                            }
+                        }}
+                    >
+                        Shop Now
+                    </Button>
+                </Container>
+            </Box>
+        </Box>
     )
 }
 
