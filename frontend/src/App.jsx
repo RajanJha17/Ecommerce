@@ -4,6 +4,9 @@ import Home from './pages/Home'
 import './App.css'
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ProductDetails from './pages/ProductDetails';
+import Product from './pages/Product';
+
 
 
 function Layout({ children }) {
@@ -34,6 +37,8 @@ const App = () => {
    <Layout>
      <Routes>
       <Route path="/" element={<Home />} />
+      <Route path='/product/:id' element={<ProductDetails />} />
+      <Route path='/product' element={<Product />} />
 
     </Routes>
    </Layout>

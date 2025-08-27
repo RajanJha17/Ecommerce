@@ -111,7 +111,7 @@ export const requestPasswordReset=async(req, res,next)=>{
         // Generate password reset token
         const resetToken = user.generatePasswordResetToken();
         await user.save({validateBeforeSave: false});
-        const resetPasswordUrl=`http://localhost:8000/api/v1/password/reset/${resetToken}`;
+        const resetPasswordUrl=`https://ecommerce-jiot.onrender.com/api/v1/password/reset/${resetToken}`;
 
 
         const message=`Use the following link to reset your password: ${resetPasswordUrl}. \n\n . This link will expire in 30 minutes. \n\n if you did not request this email, please ignore it.`;

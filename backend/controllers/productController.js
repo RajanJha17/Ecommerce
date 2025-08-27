@@ -28,20 +28,34 @@ export const createProduct = async (req, res, next) => {
 // Get All Products
 export const getProducts = async (req, res, next) => {
   try {
-    const resultsPerPage = 4;
-    const apiFeatures = new APIFunctionality(Product.find(), req.query).search().filter();
-    const filteredQuery =  apiFeatures.query.clone();
+    const resultsPerPage = Number(req.query.limit) || 4;
+
+    const apiFeatures = new APIFunctionality(Product.find(), req.query)
+      .search()
+      .filter()
+      .pagination(resultsPerPage);
+
+    const filteredQuery = apiFeatures.query.clone();
     const productCount = await filteredQuery.countDocuments();
+
     const totalPages = Math.ceil(productCount / resultsPerPage);
     const page = Number(req.query.page) || 1;
-    if(page > totalPages && productCount>0){
-        return next(new ErrorHandler("This page does not exist.", 404));
+
+    if (page > totalPages && productCount > 0) {
+      return next(new ErrorHandler("This page does not exist.", 404));
     }
 
     const products = await apiFeatures.query;
 
     if (!products || products.length === 0) {
-      return next(new ErrorHandler("No products found.", 404));
+      return res.status(200).json({
+        success: true,
+        count: 0,
+        products: [],
+        productCount: 0,
+        totalPages: 0,
+        message: "No products found"
+      });
     }
 
     return res.status(200).json({
@@ -56,6 +70,8 @@ export const getProducts = async (req, res, next) => {
     return next(new ErrorHandler("Server error. Please try again later.", 500));
   }
 };
+
+
 
 
 export const updateProduct = async (req, res, next) => {

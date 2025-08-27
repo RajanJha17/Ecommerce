@@ -70,12 +70,17 @@ const productSchema=new mongoose.Schema({
         }
     ],
     colors: [{ type: String }],
+      tags: [String],
   sizes: [
     {
       size: { type: String, required: true },
       stock: { type: Number, required: true, default: 0 }
     }
   ],
+  onSale: {
+    type: Boolean,
+    default: false
+  },
     createdAt:{
         type:Date,
         default:Date.now
