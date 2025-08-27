@@ -141,7 +141,8 @@ const Product = () => {
                 type="radio"
                 name="category"
                 checked={selectedCategory === cat}
-                onChange={() => { setSelectedCategory(cat); setPage(1); }}
+                onChange={() => { setSelectedCategory(cat); setCurrentPage(1);
+                  ; }}
               /> {cat}
             </label>
           ))}
@@ -154,7 +155,8 @@ const Product = () => {
                 type="radio"
                 name="color"
                 checked={selectedColor === color}
-                onChange={() => { setSelectedColor(color); setPage(1); }}
+                onChange={() => { setSelectedColor(color); setCurrentPage(1);
+                  ; }}
               /> {color}
             </label>
           ))}
@@ -167,7 +169,8 @@ const Product = () => {
                 type="radio"
                 name="size"
                 checked={selectedSize === size}
-                onChange={() => { setSelectedSize(size); setPage(1); }}
+                onChange={() => { setSelectedSize(size); setCurrentPage(1);
+                  ; }}
               /> {size}
             </label>
           ))}
@@ -179,7 +182,8 @@ const Product = () => {
             min={0}
             max={20000}
             value={priceRange[1]}
-            onChange={e => { setPriceRange([0, Number(e.target.value)]); setPage(1); }}
+            onChange={e => { setPriceRange([0, Number(e.target.value)]); setCurrentPage(1);
+              ; }}
             style={{ width: '100%' }}
           />
           <div style={{ fontSize: 14, color: '#555', marginTop: 2 }}>Up to ₹{priceRange[1]}</div>
@@ -283,34 +287,50 @@ const Product = () => {
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginTop: 32,
-            gap: 8,
-          }}
-        >
-          <button
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="px-4 py-2 border rounded-l-md disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span className="px-4 py-2 bg-gray-100">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages || products.length < productsPerPage}
-            className="px-4 py-2 border rounded-r-md disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
-      )}
+      {/* Pagination */}
+{totalPages > 1 && (
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'center',
+      marginTop: 32,
+      gap: 6,
+      flexWrap: 'wrap',
+    }}
+  >
+    <button
+      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+      disabled={currentPage === 1}
+      className="px-4 py-2 border rounded-md disabled:opacity-50"
+    >
+      Previous
+    </button>
+
+    {/* Page numbers */}
+    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+      <button
+        key={page}
+        onClick={() => setCurrentPage(page)}
+        className={`px-3 py-2 border rounded-md ${
+          currentPage === page
+            ? "bg-blue-600 text-white font-semibold"
+            : "bg-white hover:bg-gray-100"
+        }`}
+      >
+        {page}
+      </button>
+    ))}
+
+    <button
+      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+      disabled={currentPage === totalPages || products.length < productsPerPage}
+      className="px-4 py-2 border rounded-md disabled:opacity-50"
+    >
+      Next
+    </button>
+  </div>
+)}
+
     </>
   )}
 </main>

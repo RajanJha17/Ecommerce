@@ -30,13 +30,16 @@ export const getProducts = async (req, res, next) => {
   try {
     const resultsPerPage = Number(req.query.limit) || 4;
 
+    // Start query
     const apiFeatures = new APIFunctionality(Product.find(), req.query)
       .search()
-      .filter()
-      .pagination(resultsPerPage);
+      .filter();
 
-    const filteredQuery = apiFeatures.query.clone();
-    const productCount = await filteredQuery.countDocuments();
+    // Count total matching products (without pagination)
+    const productCount = await apiFeatures.query.clone().countDocuments();
+
+    // Now apply pagination
+    apiFeatures.pagination(resultsPerPage);
 
     const totalPages = Math.ceil(productCount / resultsPerPage);
     const page = Number(req.query.page) || 1;
@@ -45,6 +48,7 @@ export const getProducts = async (req, res, next) => {
       return next(new ErrorHandler("This page does not exist.", 404));
     }
 
+    // Fetch paginated products
     const products = await apiFeatures.query;
 
     if (!products || products.length === 0) {
@@ -60,9 +64,9 @@ export const getProducts = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      count: products.length,
+      count: products.length,   // products in this page
       products,
-      productCount,
+      productCount,             // total products matching filters
       totalPages
     });
   } catch (error) {
@@ -70,6 +74,7 @@ export const getProducts = async (req, res, next) => {
     return next(new ErrorHandler("Server error. Please try again later.", 500));
   }
 };
+
 
 
 
