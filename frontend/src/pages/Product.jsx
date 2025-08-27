@@ -39,7 +39,13 @@ const Product = () => {
 
   // Fetch products on component mount and when filters change
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchProducts = async () => {
+      if (isMounted) {
+        dispatch({ type: 'product/getProduct/pending' });
+      }
+      
       const params = [];
       
       // Add filters to query params if they are selected
@@ -59,7 +65,6 @@ const Product = () => {
       // Build the URL
       const queryString = params.join('&');
       const apiUrl = `https://ecommerce-jiot.onrender.com/api/v1/products?${queryString}`;
-      console.log('Fetching products from:', apiUrl);
       
       try {
         const response = await fetch(apiUrl, {
@@ -74,14 +79,22 @@ const Product = () => {
         }
         
         const data = await response.json();
-        dispatch({ type: 'product/getProduct/fulfilled', payload: data });
+        if (isMounted) {
+          dispatch({ type: 'product/getProduct/fulfilled', payload: data });
+        }
       } catch (error) {
         console.error('Error fetching products:', error);
-        dispatch({ type: 'product/getProduct/rejected', payload: error.message });
+        if (isMounted) {
+          dispatch({ type: 'product/getProduct/rejected', payload: error.message });
+        }
       }
     };
     
     fetchProducts();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [dispatch, selectedCategory, selectedColor, selectedSize, priceRange, currentPage]);
 
   // Calculate total pages - ensure we have a minimum of 1 page
@@ -105,7 +118,14 @@ const Product = () => {
     dispatch(getProduct(`?${queryParams.toString()}`));
   };
 
-  if (loading && currentPage === 1) return <Loader />;
+  if (loading && products.length === 0) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+        <Loader />
+      </div>
+    );
+  }
+  
   if (error) return <div className="text-center py-10">Error: {error.message || 'Failed to load products'}</div>;
 
   return (
@@ -168,18 +188,34 @@ const Product = () => {
       </aside>
 
       {/* Products Grid */}
-      <main style={{ flex: 1 }}>
-  {loading ? (
-    <Loader />
-  ) : error ? (
-    <div style={{ textAlign: 'center', padding: 40, color: 'red', fontSize: 18 }}>
-      {error.message || 'Failed to load products'}
-    </div>
-  ) : products?.length === 0 ? (
-    <div style={{ textAlign: 'center', padding: 60, color: '#888', fontSize: 20 }}>
-      🚫 No products found. Try adjusting your filters.
-    </div>
-  ) : (
+      <main style={{ flex: 1, position: 'relative' }}>
+        {loading && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(255, 255, 255, 0.7)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 10
+          }}>
+            <div style={{ transform: 'scale(0.8)' }}>
+              <Loader />
+            </div>
+          </div>
+        )}
+        {error ? (
+          <div style={{ textAlign: 'center', padding: 40, color: 'red', fontSize: 18 }}>
+            {error.message || 'Failed to load products'}
+          </div>
+        ) : products?.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: 60, color: '#888', fontSize: 20 }}>
+            🚫 No products found. Try adjusting your filters.
+          </div>
+        ) : (
     <>
       <div
         style={{
